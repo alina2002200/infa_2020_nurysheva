@@ -226,7 +226,7 @@ def all_birds_from_below(screen, color):
     bird(screen, 0.45, 660, 460, color)
 
 
-# creates transparent birds in the top
+# creates transparent birds in the top (Added function)
 def transparent_birds_from_above(surface_bird, color):
     '''
     surface_bird - screen in type pygame.Surface
