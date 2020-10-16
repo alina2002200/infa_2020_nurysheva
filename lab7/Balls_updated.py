@@ -28,12 +28,14 @@ class Target:
         self.screen = screen
         self.v_x = randint(-3, 3)
         self.v_y = randint(-3, 3)
+        self.rect = (self.x, self.y)
         self.score = randint(1, 5)
         
     
     def move(self):
         self.x += self.v_x
         self.y += self.v_y
+        self.rect = (self.x, self.y)
         
         
     def check_border(self, width, length):
@@ -56,15 +58,10 @@ class Pictures(Target):
             self.coefficient = 2
         else:
             self.image = pygame.image.load('shrek6.png')
-            self.coefficient = 1            
-        self.x = randint(100, width)
-        self.y = randint(100, length)   
-        #self.rect = self.image.get_rect()
-        self.rect = (self.x, self.y)
+            self.coefficient = 1 
+        self.rect = self.image.get_rect()
         self.scal = randint(40, 60)
         self.image = pygame.transform.scale(self.image, (self.scal, self.scal))
-        self.v_x = randint(-3, 3)
-        self.v_y = randint(-3, 3)
         
         
     def draw(self):
@@ -108,7 +105,8 @@ class Ball(Target):
             return True
         else:
             return False
-  
+
+
 class Square(Target):
     def __init__(self, screen, width, length):
         super().__init__(screen, width, length)
@@ -151,9 +149,18 @@ pictures = [Pictures(screen, width, length) for i in range(10)]
 while not finished:
     clock.tick(FPS)
     screen.fill(WHITE)
-    score(Score)
     for ball in balls:
         ball.check_border(width, length) 
+        for i in balls:
+            for j in balls:
+                if i!= j:
+                    condition_xb = i.x + 2*i.r > j.x and j.x + 2*j.r > i.x
+                    condition_yb = i.y + 2*i.r > j.y and j.y + 2*j.r > i.y
+                    if condition_xb and condition_yb:
+                        i.v_x = -i.v_x
+                        i.v_y = -i.v_y
+                        j.v_x = -j.v_x
+                        j.v_y = -j.v_y                        
         ball.move()
         ball.draw()
     for square in squares:
@@ -163,15 +170,10 @@ while not finished:
     for picture in pictures:
         picture.check_border(width, length) 
         picture.move()
-        picture.draw()        
-    '''   
-    for i in ball:
-        for j in ball:
-            if i!= j:
-                condition_xb = i.self.rect.x + i.scal > j.self.rect.x and i.self.rect.x > 
-                condition_yb = 
-                if(i.self.rect.x == j.self.rect.x):
-    '''                  
+        picture.draw() 
+    score(Score)        
+       
+                     
     pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
