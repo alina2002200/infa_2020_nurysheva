@@ -57,9 +57,10 @@ class Pictures(Target):
         else:
             self.image = pygame.image.load('shrek6.png')
             self.coefficient = 1            
-        self.rect = self.image.get_rect()
         self.x = randint(100, width)
-        self.y = randint(100, length)
+        self.y = randint(100, length)   
+        #self.rect = self.image.get_rect()
+        self.rect = (self.x, self.y)
         self.scal = randint(40, 60)
         self.image = pygame.transform.scale(self.image, (self.scal, self.scal))
         self.v_x = randint(-3, 3)
@@ -69,17 +70,18 @@ class Pictures(Target):
     def draw(self):
         screen.blit(self.image, self.rect)
     
+    
     def check_event(self, coords):
         '''
         coords in type list
         determines if we hit the object
         '''
         x_m, y_m = coords
-        if x_m >= self.rect.x and x_m <= self.rect.x + self.scal:
+        if x_m >= self.x and x_m <= self.x + self.scal:
             condition_x = True
         else:
             condition_x = False
-        if self.rect.y <= y_m and self.rect.y + self.scal >= y_m:
+        if self.y <= y_m and self.y + self.scal >= y_m:
             condition_y = True
         else:
             condition_y = False
@@ -94,6 +96,7 @@ class Ball(Target):
         super().__init__(screen, width, length)
         self.r = randint(10, 99)
         self.color = COLORS[randint(0, 5)]
+        
         
     def draw(self):
         ellps = pygame.draw.ellipse(self.screen, self.color, [self.x, self.y, self.r, self.r])
