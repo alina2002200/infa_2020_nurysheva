@@ -8,11 +8,11 @@ print (dir(math))
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x600')
-canv = tk.Canvas(root, bg='white')
-canv.pack(fill=tk.BOTH, expand=1)
+canv = tk.Canvas(root, bg = 'white')
+canv.pack(fill = tk.BOTH, expand = 1)
         
 class Ball():
-    def __init__(self, x=40, y=450):
+    def __init__(self, x = 40, y = 450):
         """
         Constructor of class Ball
         Args:
@@ -58,7 +58,7 @@ class Ball():
             balls.pop(balls.index(self))
             canv.delete(self.id)
         else:
-            self.live-=1
+            self.live -= 1
         self.set_coords()
 
     def hittest(self, obj):
@@ -112,6 +112,9 @@ class Target():
         self.points += points
         # writes number of points
         canv.itemconfig(self.id_points, text = self.points)
+    def move(self):
+        self.x += 3
+        self.x += 3
 
 
 class Gun():
@@ -160,9 +163,9 @@ class Gun():
             if event.x - 20 != 0:
                 self.an = math.atan((event.y - 450) / (event.x - 20))
         if self.f2_on:
-            canv.itemconfig(self.id, fill='orange')
+            canv.itemconfig(self.id, fill = 'orange')
         else:
-            canv.itemconfig(self.id, fill='black')
+            canv.itemconfig(self.id, fill = 'black')
         canv.coords(self.id, 20, 450,
                     20 + max(self.f2_power, 20) * math.cos(self.an),
                     450 + max(self.f2_power, 20) * math.sin(self.an))
@@ -174,13 +177,14 @@ class Gun():
         if self.f2_on:
             if self.f2_power < 100:
                 self.f2_power += 1
-            canv.itemconfig(self.id, fill='orange')
+            canv.itemconfig(self.id, fill = 'orange')
         else:
-            canv.itemconfig(self.id, fill='black')
+            canv.itemconfig(self.id, fill = 'black')
 
 
 t1 = Target()
-screen1 = canv.create_text(400, 300, text='', font='28')
+t2 = Target()
+screen1 = canv.create_text(400, 300, text = '', font = '28')
 g1 = Gun()
 bullet = 0
 balls = []
@@ -190,8 +194,9 @@ def new_game(event=''):
     '''
     creates new game
     '''
-    global Gun, t1, screen1, balls, bullet
+    global Gun, t1, t2, screen1, balls, bullet
     t1.new_target()
+    t2.new_target()
     bullet = 0
     balls = []
     canv.bind('<Button-1>', g1.fire2_start)
@@ -199,15 +204,22 @@ def new_game(event=''):
     canv.bind('<Motion>', g1.targetting)
     z = 0.03
     t1.live = 1
-    while t1.live or balls:
+    t2.live = 1
+    while t1.live or t2.live or balls:
         for b in balls:
             b.move()
+            #t1.move()
+            #t2.move() maybe it has to be elsewhere
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
-                canv.bind('<Button-1>', '')
+            elif b.hittest(t2) and t2.live:
+                t2.live = 0
+                t2.hit()
+            elif t1.live == 0 and t2.live == 0:
+                canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
+                canv.bind('<Button-1>', '') 
                 canv.bind('<ButtonRelease-1>', '')
-                canv.itemconfig(screen1, text='Вы уничтожили цель за ' + str(bullet) + ' выстрелов')
         canv.update()
         time.sleep(0.03)
         g1.targetting()
