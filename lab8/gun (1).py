@@ -190,7 +190,7 @@ def new_game(event=''):
     '''
     creates new game
     '''
-    global gun, t1, screen1, balls, bullet
+    global Gun, t1, screen1, balls, bullet
     t1.new_target()
     bullet = 0
     balls = []
@@ -214,7 +214,7 @@ def new_game(event=''):
         g1.power_up()
         canv.delete(balls)
     canv.itemconfig(screen1, text='')
-    canv.delete(gun)
+    canv.delete(Gun)
     root.after(750, new_game)
 
 
