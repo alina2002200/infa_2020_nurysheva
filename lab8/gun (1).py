@@ -48,6 +48,7 @@ class Ball():
         Moves ball one one step in time
         Updates self.x and self.y    
         '''
+        self.vy -= 1
         if self.x + self.vx <= 0 or self.x + self.vx >= 800:
             self.vx = -self.vx
         if self.y + self.vy <= 0 or  self.y + self.vy >= 600:
@@ -101,7 +102,7 @@ class Target():
         y = self.y = rnd(300, 550)
         r = self.r = rnd(2, 50)
         color = self.color = 'red'
-        canv.coords(self.id, x-r, y-r, x+r, y+r)
+        canv.coords(self.id, x - r, y - r, x + r, y + r)
         canv.itemconfig(self.id, fill = color)
 
     def hit(self, points = 1):
@@ -112,9 +113,9 @@ class Target():
         self.points += points
         # writes number of points
         canv.itemconfig(self.id_points, text = self.points)
+        
     def move(self):
-        self.x += 3
-        self.x += 3
+       a = rnd(0, 1)
 
 
 class Gun():
@@ -148,7 +149,7 @@ class Gun():
         bullet += 1
         new_ball = Ball()
         new_ball.r += 5
-        self.an = math.atan((event.y-new_ball.y) / (event.x-new_ball.x))
+        self.an = math.atan((event.y - new_ball.y) / (event.x - new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
         balls += [new_ball]
@@ -206,10 +207,10 @@ def new_game(event=''):
     t1.live = 1
     t2.live = 1
     while t1.live or t2.live or balls:
+        t1.move()
+        t2.move() # maybe it has to be elsewhere
         for b in balls:
             b.move()
-            #t1.move()
-            #t2.move() maybe it has to be elsewhere
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
@@ -231,6 +232,5 @@ def new_game(event=''):
 
 
 new_game()
-mainloop()
-
-
+root.mainloop()
+ 
