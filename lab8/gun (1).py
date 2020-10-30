@@ -101,6 +101,8 @@ class Target():
         x = self.x = rnd(600, 780)
         y = self.y = rnd(300, 550)
         r = self.r = rnd(2, 50)
+        self.vx = rnd(-5, 5)
+        self.vy = rnd(-5, 5)
         color = self.color = 'red'
         canv.coords(self.id, x - r, y - r, x + r, y + r)
         canv.itemconfig(self.id, fill = color)
@@ -114,8 +116,25 @@ class Target():
         # writes number of points
         canv.itemconfig(self.id_points, text = self.points)
         
+    def check_border(self):
+        '''
+        checks if border was hiiten 
+        changes sign of velocities 
+        '''
+        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
+            self.vx = -self.vx
+        if self.y + self.vy <= 0 or  self.y + self.vy >= 600:
+            self.vy = -self.vy
+            
     def move(self):
-       a = rnd(0, 1)
+       '''
+       moves target on one step in time
+       '''
+       self.check_border()
+       self.x += self.vx
+       self.y += self.vy
+       canv.coords(self.id, self.x - self.r, self.y - self.r, 
+                   self.x + self.r, self.y + self.r)
 
 
 class Gun():
@@ -207,8 +226,10 @@ def new_game(event=''):
     t1.live = 1
     t2.live = 1
     while t1.live or t2.live or balls:
-        t1.move()
-        t2.move() # maybe it has to be elsewhere
+        if t1.live > 0:
+            t1.move()
+        if t2.live > 0:
+            t2.move() 
         for b in balls:
             b.move()
             if b.hittest(t1) and t1.live:
