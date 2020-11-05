@@ -91,8 +91,6 @@ class Target():
         self.points = 0
         self.live = 1
         self.id = canv.create_oval(0, 0, 0, 0)
-        # contains number of hitten targets
-        self.id_points = canv.create_text(30, 30, text = self.points, font = '28')
 
     def new_target(self):
         ''' 
@@ -109,12 +107,10 @@ class Target():
 
     def hit(self, points = 1):
         '''
-        Points in type int
+        points in type int
         '''
         canv.coords(self.id, -10, -10, -10, -10)
         self.points += points
-        # writes number of points
-        canv.itemconfig(self.id_points, text = self.points)
         
     def check_border(self):
         '''
@@ -137,6 +133,26 @@ class Target():
                    self.x + self.r, self.y + self.r)
 
 
+class Point():
+    '''
+    class that creates text which reflects points of game
+    '''
+    def __init__(self, point1, point2): 
+        '''
+        points1, points2 in type int
+        creates text - number of points
+        '''
+        # contains number of hitten targets
+        self.id_points = canv.create_text(30, 30, text = point1 + point2, font = '28')
+    def if_hitted(self, point3, point4):
+        '''
+        updates number of points if strike came out
+        points1, points2 in type int
+        '''
+        # writes number of points
+        canv.itemconfig(self.id_points, text = point3 + point4)
+        
+        
 class Gun():
     '''
     class that discribes Gun
@@ -204,13 +220,14 @@ class Gun():
 
 t1 = Target()
 t2 = Target()
+p = Point(t1.points, t2.points)
 screen1 = canv.create_text(400, 300, text = '', font = '28')
 g1 = Gun()
 bullet = 0
 balls = []
 
 
-def new_game(event=''):
+def new_game(event = ''):
     '''
     creates new game
     '''
@@ -235,9 +252,11 @@ def new_game(event=''):
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
+                p.if_hitted(t1.points, t2.points)
             elif b.hittest(t2) and t2.live:
                 t2.live = 0
                 t2.hit()
+                p.if_hitted(t1.points, t2.points)
             elif t1.live == 0 and t2.live == 0:
                 canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
                 canv.bind('<Button-1>', '') 
@@ -247,7 +266,7 @@ def new_game(event=''):
         g1.targetting()
         g1.power_up()
         canv.delete(balls)
-    canv.itemconfig(screen1, text='')
+    canv.itemconfig(screen1, text = '')
     canv.delete(Gun)
     root.after(750, new_game)
 
