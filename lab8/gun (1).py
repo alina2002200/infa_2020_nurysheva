@@ -1,7 +1,10 @@
 from random import randrange as rnd, choice
+from random import randint
 import tkinter as tk
 import math
 import time
+from PIL import Image, ImageTk
+
 
 print (dir(math))
 
@@ -10,7 +13,63 @@ fr = tk.Frame(root)
 root.geometry('800x600')
 canv = tk.Canvas(root, bg = 'white')
 canv.pack(fill = tk.BOTH, expand = 1)
+image1 = Image.open('shrek5.png')
+image1 = image1.resize((50, 50), Image.ANTIALIAS)
+lion_image = ImageTk.PhotoImage(image1)  
+
+class Picture():
+    '''
+    class that describes picture
+    '''
+    def __init__(self):
+        '''
+        sets initial characteristics of picture
+        '''
+        self.points = 0
+        self.live = 1
+        self.r = 10
+        self.id = canv.create_image(0, 0, anchor = 'nw', image = lion_image)
         
+    def new_target(self):
+        ''' 
+        Creates new picture 
+        '''
+        x = self.x = rnd(600, 780)
+        y = self.y = rnd(300, 550)
+        self.vx = rnd(-5, 5)
+        self.vy = rnd(-5, 5)
+        color = self.color = 'red'
+        canv.coords(self.id, self.x, self.y)
+
+    def hit(self, points = 1):
+        '''
+        points in type int
+        '''
+        canv.coords(self.id, -10, -10)
+        self.points += points
+        
+    def check_border(self):
+        '''
+        checks if border was hiiten 
+        changes sign of velocities 
+        '''
+        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
+            self.vx = -self.vx
+        if self.y + self.vy <= 0 or  self.y + self.vy >= 600:
+            self.vy = -self.vy
+            
+    def move(self):
+       '''
+       moves picture on one step in time
+       '''
+       self.check_border()
+       self.x += self.vx
+       self.y += self.vy
+       canv.coords(self.id, self.x + self.vx, self.y + self.vy)
+
+
+
+       
 class Ball():
     def __init__(self, x = 40, y = 450):
         """
@@ -45,7 +104,7 @@ class Ball():
 
     def move(self):
         '''
-        Moves ball one one step in time
+        Moves ball on one step in time
         Updates self.x and self.y    
         '''
         self.vy -= 1
@@ -137,20 +196,20 @@ class Point():
     '''
     class that creates text which reflects points of game
     '''
-    def __init__(self, point1, point2): 
+    def __init__(self, point1, point2, point3): 
         '''
         points1, points2 in type int
         creates text - number of points
         '''
         # contains number of hitten targets
         self.id_points = canv.create_text(30, 30, text = point1 + point2, font = '28')
-    def if_hitted(self, point3, point4):
+    def if_hitted(self, point4, point5, point6):
         '''
         updates number of points if strike came out
         points1, points2 in type int
         '''
         # writes number of points
-        canv.itemconfig(self.id_points, text = point3 + point4)
+        canv.itemconfig(self.id_points, text = point4 + point5 + point6)
         
         
 class Gun():
@@ -180,7 +239,7 @@ class Gun():
         strikes when we push the mouse button
         event in type list
         '''
-        global balls, bullet
+        global balls, pictures, bullet
         bullet += 1
         new_ball = Ball()
         new_ball.r += 5
@@ -220,20 +279,23 @@ class Gun():
 
 t1 = Target()
 t2 = Target()
-p = Point(t1.points, t2.points)
+im1 = Picture()
+p = Point(t1.points, t2.points, im1.points)
 screen1 = canv.create_text(400, 300, text = '', font = '28')
 g1 = Gun()
 bullet = 0
 balls = []
 
 
+
 def new_game(event = ''):
     '''
     creates new game
     '''
-    global Gun, t1, t2, screen1, balls, bullet
+    global Gun, t1, t2, im1, screen1, balls, bullet
     t1.new_target()
     t2.new_target()
+    im1.new_target()
     bullet = 0
     balls = []
     canv.bind('<Button-1>', g1.fire2_start)
@@ -242,26 +304,35 @@ def new_game(event = ''):
     z = 0.03
     t1.live = 1
     t2.live = 1
-    while t1.live or t2.live or balls:
+    im1.live = 1
+    while t1.live or t2.live or im1.live or balls:
         if t1.live > 0:
             t1.move()
         if t2.live > 0:
-            t2.move() 
+            t2.move()
+        if im1.live > 0:
+            im1.move()        
         for b in balls:
             b.move()
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
-                p.if_hitted(t1.points, t2.points)
+                p.if_hitted(t1.points, t2.points, im1.points)
             elif b.hittest(t2) and t2.live:
                 t2.live = 0
                 t2.hit()
-                p.if_hitted(t1.points, t2.points)
-            elif t1.live == 0 and t2.live == 0:
-                canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
+                p.if_hitted(t1.points, t2.points, im1.points)
+            elif b.hittest(im1) and im1.live:
+                im1.live = 0
+                im1.hit()
+                p.if_hitted(t1.points, t2.points, im1.points)            
+            elif t1.live == 0 and t2.live == 0 and im1.live == 0:
+                canv.itemconfig(screen1, text = 'Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
                 canv.bind('<Button-1>', '') 
                 canv.bind('<ButtonRelease-1>', '')
+        # updates screen after every step
         canv.update()
+        # time between two updates
         time.sleep(0.03)
         g1.targetting()
         g1.power_up()
