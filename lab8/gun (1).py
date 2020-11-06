@@ -30,7 +30,7 @@ class Picture1():
         '''
         self.points = 0
         self.live = 1
-        self.r = 10
+        self.r = 25
         self.id = canv.create_image(0, 0, anchor='nw', image=lion_image)
 
     def new_target(self):
@@ -82,7 +82,7 @@ class Picture2():
         '''
         self.points = 0
         self.live = 1
-        self.r = 10
+        self.r = 25
         self.id = canv.create_image(0, 0, anchor='nw', image=fiksik_image)
 
     def new_target(self):
@@ -118,6 +118,10 @@ class Picture2():
         moves picture on one step in time
         '''
         self.check_border()
+        if self.vx > 0:
+            self.vx += 0.05
+        else:
+            self.vx -= 0.05
         self.x += self.vx
         self.y += self.vy
         canv.coords(self.id, self.x + self.vx, self.y + self.vy)
@@ -138,11 +142,18 @@ class Ball():
         self.vy = 0
         self.color = choice(['blue', 'green', 'red', 'brown'])
         # draws ball
-        self.id = canv.create_oval(self.x - self.r,
-                                   self.y - self.r,
-                                   self.x + self.r,
-                                   self.y + self.r,
-                                   fill=self.color)
+        if randint(0, 1):
+            self.id = canv.create_oval(self.x - self.r,
+                                       self.y - self.r,
+                                       self.x + self.r,
+                                       self.y + self.r,
+                                       fill=self.color)
+        else:
+            self.id = canv.create_rectangle(self.x - self.r,
+                                            self.y - self.r,
+                                            self.x + self.r,
+                                            self.y + self.r,
+                                            fill=self.color)
         self.live = 30
 
     def set_coords(self):
@@ -203,7 +214,10 @@ class Target():
         '''
         self.points = 0
         self.live = 1
-        self.id = canv.create_oval(0, 0, 0, 0)
+        if randint(0, 1):
+            self.id = canv.create_oval(0, 0, 0, 0)
+        else:
+            self.id = canv.create_rectangle(0, 0, 0, 0)
 
     def new_target(self):
         ''' 
