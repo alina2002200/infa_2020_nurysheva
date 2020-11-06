@@ -15,9 +15,11 @@ canv.pack(fill=tk.BOTH, expand=1)
 image1 = Image.open('shrek5.png')
 image1 = image1.resize((50, 50), Image.ANTIALIAS)
 lion_image = ImageTk.PhotoImage(image1)
+image2 = Image.open('shrek6.png')
+image2 = image2.resize((50, 50), Image.ANTIALIAS)
+fiksik_image = ImageTk.PhotoImage(image2)
 
-
-class Picture():
+class Picture1():
     '''
     class that describes picture
     '''
@@ -53,6 +55,58 @@ class Picture():
         '''
         checks if border was hiiten 
         changes sign of velocities 
+        '''
+        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
+            self.vx = -self.vx
+        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
+            self.vy = -self.vy
+
+    def move(self):
+        '''
+        moves picture on one step in time
+        '''
+        self.check_border()
+        self.x += self.vx
+        self.y += self.vy
+        canv.coords(self.id, self.x + self.vx, self.y + self.vy)
+
+
+class Picture2():
+    '''
+    class that describes picture
+    '''
+
+    def __init__(self):
+        '''
+        sets initial characteristics of picture
+        '''
+        self.points = 0
+        self.live = 1
+        self.r = 10
+        self.id = canv.create_image(0, 0, anchor='nw', image=fiksik_image)
+
+    def new_target(self):
+        '''
+        Creates new picture
+        '''
+        x = self.x = rnd(600, 780)
+        y = self.y = rnd(300, 550)
+        self.vx = rnd(-5, 5)
+        self.vy = rnd(-5, 5)
+        color = self.color = 'red'
+        canv.coords(self.id, self.x, self.y)
+
+    def hit(self, points=1):
+        '''
+        points in type int
+        '''
+        canv.coords(self.id, -100, -100)
+        self.points += points
+
+    def check_border(self):
+        '''
+        checks if border was hiiten
+        changes sign of velocities
         '''
         if self.x + self.vx <= 0 or self.x + self.vx >= 800:
             self.vx = -self.vx
@@ -197,7 +251,7 @@ class Point():
     class that creates text which reflects points of game
     '''
 
-    def __init__(self, point1, point2, point3):
+    def __init__(self, point1, point2, point3, point4):
         '''
         points1, points2 in type int
         creates text - number of points
@@ -205,13 +259,13 @@ class Point():
         # contains number of hitten targets
         self.id_points = canv.create_text(30, 30, text=point1 + point2, font='28')
 
-    def if_hitted(self, point4, point5, point6):
+    def if_hitted(self, point5, point6, point7, point8):
         '''
         updates number of points if strike came out
         points1, points2 in type int
         '''
         # writes number of points
-        canv.itemconfig(self.id_points, text=point4 + point5 + point6)
+        canv.itemconfig(self.id_points, text=point5 + point6 + point7 + point8)
 
 
 class Gun():
@@ -282,8 +336,9 @@ class Gun():
 
 t1 = Target()
 t2 = Target()
-im1 = Picture()
-p = Point(t1.points, t2.points, im1.points)
+im1 = Picture1()
+im2 = Picture2()
+p = Point(t1.points, t2.points, im1.points, im2.points)
 screen1 = canv.create_text(400, 300, text='', font='28')
 g1 = Gun()
 bullet = 0
@@ -294,10 +349,11 @@ def new_game(event=''):
     '''
     creates new game
     '''
-    global Gun, t1, t2, im1, screen1, balls, bullet
+    global Gun, t1, t2, im1, im2, screen1, balls, bullet
     t1.new_target()
     t2.new_target()
     im1.new_target()
+    im2.new_target()
     bullet = 0
     balls = []
     canv.bind('<Button-1>', g1.fire2_start)
@@ -307,28 +363,35 @@ def new_game(event=''):
     t1.live = 1
     t2.live = 1
     im1.live = 1
-    while t1.live or t2.live or im1.live or balls:
+    im2.live = 1
+    while t1.live or t2.live or im1.live or im2.live or balls:
         if t1.live > 0:
             t1.move()
         if t2.live > 0:
             t2.move()
         if im1.live > 0:
             im1.move()
+        if im2.live > 0:
+            im2.move()
         for b in balls:
             b.move()
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
-                p.if_hitted(t1.points, t2.points, im1.points)
+                p.if_hitted(t1.points, t2.points, im1.points, im2.points)
             if b.hittest(t2) and t2.live:
                 t2.live = 0
                 t2.hit()
-                p.if_hitted(t1.points, t2.points, im1.points)
+                p.if_hitted(t1.points, t2.points, im1.points, im2.points)
             if b.hittest(im1) and im1.live:
                 im1.live = 0
                 im1.hit()
-                p.if_hitted(t1.points, t2.points, im1.points)
-            if t1.live == 0 and t2.live == 0 and im1.live == 0:
+                p.if_hitted(t1.points, t2.points, im1.points, im2.points)
+            if b.hittest(im2) and im2.live:
+                im2.live = 0
+                im2.hit()
+                p.if_hitted(t1.points, t2.points, im1.points, im2.points)
+            if t1.live == 0 and t2.live == 0 and im1.live == 0 and im2.live == 0:
                 canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
                 canv.bind('<Button-1>', '')
                 canv.bind('<ButtonRelease-1>', '')
