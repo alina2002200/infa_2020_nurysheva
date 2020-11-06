@@ -5,22 +5,23 @@ import math
 import time
 from PIL import Image, ImageTk
 
-
-print (dir(math))
+print(dir(math))
 
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x600')
-canv = tk.Canvas(root, bg = 'white')
-canv.pack(fill = tk.BOTH, expand = 1)
+canv = tk.Canvas(root, bg='white')
+canv.pack(fill=tk.BOTH, expand=1)
 image1 = Image.open('shrek5.png')
 image1 = image1.resize((50, 50), Image.ANTIALIAS)
-lion_image = ImageTk.PhotoImage(image1)  
+lion_image = ImageTk.PhotoImage(image1)
+
 
 class Picture():
     '''
     class that describes picture
     '''
+
     def __init__(self):
         '''
         sets initial characteristics of picture
@@ -28,8 +29,8 @@ class Picture():
         self.points = 0
         self.live = 1
         self.r = 10
-        self.id = canv.create_image(0, 0, anchor = 'nw', image = lion_image)
-        
+        self.id = canv.create_image(0, 0, anchor='nw', image=lion_image)
+
     def new_target(self):
         ''' 
         Creates new picture 
@@ -41,13 +42,13 @@ class Picture():
         color = self.color = 'red'
         canv.coords(self.id, self.x, self.y)
 
-    def hit(self, points = 1):
+    def hit(self, points=1):
         '''
         points in type int
         '''
-        canv.coords(self.id, -10, -10)
+        canv.coords(self.id, -1000, -1000)
         self.points += points
-        
+
     def check_border(self):
         '''
         checks if border was hiiten 
@@ -55,23 +56,21 @@ class Picture():
         '''
         if self.x + self.vx <= 0 or self.x + self.vx >= 800:
             self.vx = -self.vx
-        if self.y + self.vy <= 0 or  self.y + self.vy >= 600:
+        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
             self.vy = -self.vy
-            
+
     def move(self):
-       '''
-       moves picture on one step in time
-       '''
-       self.check_border()
-       self.x += self.vx
-       self.y += self.vy
-       canv.coords(self.id, self.x + self.vx, self.y + self.vy)
+        '''
+        moves picture on one step in time
+        '''
+        self.check_border()
+        self.x += self.vx
+        self.y += self.vy
+        canv.coords(self.id, self.x + self.vx, self.y + self.vy)
 
 
-
-       
 class Ball():
-    def __init__(self, x = 40, y = 450):
+    def __init__(self, x=40, y=450):
         """
         Constructor of class Ball
         Args:
@@ -89,7 +88,7 @@ class Ball():
                                    self.y - self.r,
                                    self.x + self.r,
                                    self.y + self.r,
-                                   fill = self.color)
+                                   fill=self.color)
         self.live = 30
 
     def set_coords(self):
@@ -110,8 +109,8 @@ class Ball():
         self.vy -= 1
         if self.x + self.vx <= 0 or self.x + self.vx >= 800:
             self.vx = -self.vx
-        if self.y + self.vy <= 0 or  self.y + self.vy >= 600:
-            self.vy = -self.vy  
+        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
+            self.vy = -self.vy
         self.x += self.vx
         self.y -= self.vy
         if self.live < 0:
@@ -129,20 +128,21 @@ class Ball():
         Returns:
             Returns true if hitting took place, else brings false
         '''
-        rho_1 = (self.x + self.r - obj.x - obj.r)**2
-        rho_2 = (self.y + self.r  - obj.y - obj.r)**2
-        rho_3 = (self.r + obj.r)**2
+        rho_1 = (self.x + self.r - obj.x - obj.r) ** 2
+        rho_2 = (self.y + self.r - obj.y - obj.r) ** 2
+        rho_3 = (self.r + obj.r) ** 2
         condition = rho_1 + rho_2 <= rho_3
         if condition:
             return True
         else:
             return False
-         
-         
+
+
 class Target():
     '''
     class that describes target
     '''
+
     def __init__(self):
         '''
         sets initial characteristics of target
@@ -162,15 +162,15 @@ class Target():
         self.vy = rnd(-5, 5)
         color = self.color = 'red'
         canv.coords(self.id, x - r, y - r, x + r, y + r)
-        canv.itemconfig(self.id, fill = color)
+        canv.itemconfig(self.id, fill=color)
 
-    def hit(self, points = 1):
+    def hit(self, points=1):
         '''
         points in type int
         '''
         canv.coords(self.id, -10, -10, -10, -10)
         self.points += points
-        
+
     def check_border(self):
         '''
         checks if border was hiiten 
@@ -178,45 +178,48 @@ class Target():
         '''
         if self.x + self.vx <= 0 or self.x + self.vx >= 800:
             self.vx = -self.vx
-        if self.y + self.vy <= 0 or  self.y + self.vy >= 600:
+        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
             self.vy = -self.vy
-            
+
     def move(self):
-       '''
-       moves target on one step in time
-       '''
-       self.check_border()
-       self.x += self.vx
-       self.y += self.vy
-       canv.coords(self.id, self.x - self.r, self.y - self.r, 
-                   self.x + self.r, self.y + self.r)
+        '''
+        moves target on one step in time
+        '''
+        self.check_border()
+        self.x += self.vx
+        self.y += self.vy
+        canv.coords(self.id, self.x - self.r, self.y - self.r,
+                    self.x + self.r, self.y + self.r)
 
 
 class Point():
     '''
     class that creates text which reflects points of game
     '''
-    def __init__(self, point1, point2, point3): 
+
+    def __init__(self, point1, point2, point3):
         '''
         points1, points2 in type int
         creates text - number of points
         '''
         # contains number of hitten targets
-        self.id_points = canv.create_text(30, 30, text = point1 + point2, font = '28')
+        self.id_points = canv.create_text(30, 30, text=point1 + point2, font='28')
+
     def if_hitted(self, point4, point5, point6):
         '''
         updates number of points if strike came out
         points1, points2 in type int
         '''
         # writes number of points
-        canv.itemconfig(self.id_points, text = point4 + point5 + point6)
-        
-        
+        canv.itemconfig(self.id_points, text=point4 + point5 + point6)
+
+
 class Gun():
     '''
     class that discribes Gun
     '''
-    def __init__(self, x = 40, y = 450):
+
+    def __init__(self, x=40, y=450):
         '''
         x in type int
         y in type int
@@ -225,7 +228,7 @@ class Gun():
         self.f2_on = 0
         self.an = 1
         # draws gun
-        self.id = canv.create_line(20, 450, 50, 420, width = 7)
+        self.id = canv.create_line(20, 450, 50, 420, width=7)
 
     def fire2_start(self, event):
         '''
@@ -250,7 +253,7 @@ class Gun():
         self.f2_on = 0
         self.f2_power = 10
 
-    def targetting(self, event = 0):
+    def targetting(self, event=0):
         '''
         event in type int
         '''
@@ -258,9 +261,9 @@ class Gun():
             if event.x - 20 != 0:
                 self.an = math.atan((event.y - 450) / (event.x - 20))
         if self.f2_on:
-            canv.itemconfig(self.id, fill = 'orange')
+            canv.itemconfig(self.id, fill='orange')
         else:
-            canv.itemconfig(self.id, fill = 'black')
+            canv.itemconfig(self.id, fill='black')
         canv.coords(self.id, 20, 450,
                     20 + max(self.f2_power, 20) * math.cos(self.an),
                     450 + max(self.f2_power, 20) * math.sin(self.an))
@@ -272,23 +275,22 @@ class Gun():
         if self.f2_on:
             if self.f2_power < 100:
                 self.f2_power += 1
-            canv.itemconfig(self.id, fill = 'orange')
+            canv.itemconfig(self.id, fill='orange')
         else:
-            canv.itemconfig(self.id, fill = 'black')
+            canv.itemconfig(self.id, fill='black')
 
 
 t1 = Target()
 t2 = Target()
 im1 = Picture()
 p = Point(t1.points, t2.points, im1.points)
-screen1 = canv.create_text(400, 300, text = '', font = '28')
+screen1 = canv.create_text(400, 300, text='', font='28')
 g1 = Gun()
 bullet = 0
 balls = []
 
 
-
-def new_game(event = ''):
+def new_game(event=''):
     '''
     creates new game
     '''
@@ -311,24 +313,24 @@ def new_game(event = ''):
         if t2.live > 0:
             t2.move()
         if im1.live > 0:
-            im1.move()        
+            im1.move()
         for b in balls:
             b.move()
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
                 p.if_hitted(t1.points, t2.points, im1.points)
-            elif b.hittest(t2) and t2.live:
+            if b.hittest(t2) and t2.live:
                 t2.live = 0
                 t2.hit()
                 p.if_hitted(t1.points, t2.points, im1.points)
-            elif b.hittest(im1) and im1.live:
+            if b.hittest(im1) and im1.live:
                 im1.live = 0
                 im1.hit()
-                p.if_hitted(t1.points, t2.points, im1.points)            
-            elif t1.live == 0 and t2.live == 0 and im1.live == 0:
-                canv.itemconfig(screen1, text = 'Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
-                canv.bind('<Button-1>', '') 
+                p.if_hitted(t1.points, t2.points, im1.points)
+            if t1.live == 0 and t2.live == 0 and im1.live == 0:
+                canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
+                canv.bind('<Button-1>', '')
                 canv.bind('<ButtonRelease-1>', '')
         # updates screen after every step
         canv.update()
@@ -337,11 +339,10 @@ def new_game(event = ''):
         g1.targetting()
         g1.power_up()
         canv.delete(balls)
-    canv.itemconfig(screen1, text = '')
+    canv.itemconfig(screen1, text='')
     canv.delete(Gun)
     root.after(750, new_game)
 
 
 new_game()
 root.mainloop()
- 
