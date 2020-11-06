@@ -19,6 +19,7 @@ image2 = Image.open('shrek6.png')
 image2 = image2.resize((50, 50), Image.ANTIALIAS)
 fiksik_image = ImageTk.PhotoImage(image2)
 
+
 class Picture1():
     '''
     class that describes picture
