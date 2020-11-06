@@ -46,7 +46,7 @@ class Picture():
         '''
         points in type int
         '''
-        canv.coords(self.id, -1000, -1000)
+        canv.coords(self.id, -100, -100)
         self.points += points
 
     def check_border(self):
