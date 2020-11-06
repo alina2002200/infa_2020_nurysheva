@@ -1,5 +1,5 @@
 from random import randrange as rnd, choice
-from random import randint
+from random import randint, random
 import tkinter as tk
 import math
 import time
