@@ -353,6 +353,7 @@ t1 = Target()
 t2 = Target()
 im1 = Picture1()
 im2 = Picture2()
+im = [Picture1() for i in range(5)]
 p = Point(t1.points, t2.points, im1.points, im2.points)
 screen1 = canv.create_text(400, 300, text='', font='28')
 g1 = Gun()
@@ -367,6 +368,8 @@ def new_game(event=''):
     global Gun, t1, t2, im1, im2, screen1, balls, bullet
     t1.new_target()
     t2.new_target()
+    for i in im:
+        i.new_target()
     im1.new_target()
     im2.new_target()
     bullet = 0
@@ -377,9 +380,14 @@ def new_game(event=''):
     z = 0.03
     t1.live = 1
     t2.live = 1
+    for i in im:
+        i.live = 1
     im1.live = 1
     im2.live = 1
-    while t1.live or t2.live or im1.live or im2.live or balls:
+    sum = 0
+    for i in im:
+        sum += i.live
+    while t1.live or t2.live or im1.live or im2.live or balls or sum > 0:
         if t1.live > 0:
             t1.move()
         if t2.live > 0:
@@ -388,8 +396,16 @@ def new_game(event=''):
             im1.move()
         if im2.live > 0:
             im2.move()
+        for i in im:
+            if i.live > 0:
+                i.move()
         for b in balls:
             b.move()
+            for i in im:
+                if b.hittest(i) and i.live:
+                    i.live = 0
+                    i.hit()
+                    p.if_hitted(t1.points, t2.points, im1.points, im2.points)
             if b.hittest(t1) and t1.live:
                 t1.live = 0
                 t1.hit()
@@ -406,7 +422,10 @@ def new_game(event=''):
                 im2.live = 0
                 im2.hit()
                 p.if_hitted(t1.points, t2.points, im1.points, im2.points)
-            if t1.live == 0 and t2.live == 0 and im1.live == 0 and im2.live == 0:
+            sum = 0
+            for i in im:
+                sum += i.live
+            if t1.live == 0 and t2.live == 0 and im1.live == 0 and im2.live == 0 and sum == 0:
                 canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
                 canv.bind('<Button-1>', '')
                 canv.bind('<ButtonRelease-1>', '')
