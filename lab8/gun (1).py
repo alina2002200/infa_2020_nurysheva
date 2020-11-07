@@ -19,6 +19,14 @@ lion_image = ImageTk.PhotoImage(image1)
 image2 = Image.open('shrek6.png')
 image2 = image2.resize((50, 50), Image.ANTIALIAS)
 fiksik_image = ImageTk.PhotoImage(image2)
+image3 = Image.open('tank.png')
+image3 = image3.resize((100, 100), Image.ANTIALIAS)
+tank_image = ImageTk.PhotoImage(image3)
+image4 = Image.open('grass.png')
+image4 = image4.resize((800, 600), Image.ANTIALIAS)
+grass_image = ImageTk.PhotoImage(image4)
+# created background
+canv.create_image(400, 300, image=grass_image)
 
 
 class Targets_functions():
@@ -94,6 +102,7 @@ class Picture2(Targets_functions):
     number of poins, living limit, radious
     from Target_functions
     '''
+
     def __init__(self):
         '''
         sets initial characteristics of picture: image
@@ -169,7 +178,7 @@ class Target(Targets_functions):
 
 
 class Ball():
-    def __init__(self, x=40, y=450):
+    def __init__(self, x, y=450):
         """
         Constructor of class Ball
         Args:
@@ -246,7 +255,8 @@ class Ball():
 
 class Point():
     '''
-    class that creates text which reflects points of game
+    class that creates text which reflects points of game\
+    and some interface of the game
     '''
 
     def __init__(self, cl_1, cl_2, cl_3):
@@ -265,6 +275,8 @@ class Point():
         for k in cl_3:
             point += k.points
         self.id_points = canv.create_text(30, 30, text=point, font='28')
+        canv.create_text(300, 30, text="To move forward: ctrl + mousemotion", font='45')
+        canv.create_text(313, 50, text="To move backward: shift + mousemotion", font='45')
 
     def if_hitted(self, cl_1, cl_2, cl_3):
         '''
@@ -297,8 +309,10 @@ class Gun():
         self.f2_power = 10
         self.f2_on = 0
         self.an = 1
+        self.x = 150
         # draws gun
-        self.id = canv.create_line(20, 450, 50, 420, width=7)
+        self.id = canv.create_line(self.x + 20, 450, self.x + 50, 420, width=7)
+        self.id1 = canv.create_image(self.x + 2, 453, image=tank_image)
 
     def fire2_start(self, event):
         '''
@@ -314,7 +328,7 @@ class Gun():
         '''
         global balls, pictures, bullet
         bullet += 1
-        new_ball = Ball()
+        new_ball = Ball(self.x + 40)
         new_ball.r += 5
         self.an = math.atan((event.y - new_ball.y) / (event.x - new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
@@ -328,14 +342,14 @@ class Gun():
         event in type int
         '''
         if event:
-            if event.x - 20 != 0:
-                self.an = math.atan((event.y - 450) / (event.x - 20))
+            if event.x - self.x - 20 != 0:
+                self.an = math.atan((event.y - 450) / (event.x - self.x - 20))
         if self.f2_on:
             canv.itemconfig(self.id, fill='orange')
         else:
             canv.itemconfig(self.id, fill='black')
-        canv.coords(self.id, 20, 450,
-                    20 + max(self.f2_power, 20) * math.cos(self.an),
+        canv.coords(self.id, self.x + 20, 450,
+                    self.x + 20 + max(self.f2_power, 20) * math.cos(self.an),
                     450 + max(self.f2_power, 20) * math.sin(self.an))
 
     def power_up(self):
@@ -348,6 +362,24 @@ class Gun():
             canv.itemconfig(self.id, fill='orange')
         else:
             canv.itemconfig(self.id, fill='black')
+
+    def move_straight(self, event):
+        '''
+        moves gun ahead
+        event: type list
+        '''
+        self.x += 1
+        canv.coords(self.id, self.x + 20, 450, self.x + 50, 420)
+        canv.coords(self.id1, self.x + 2, 453)
+
+    def move_back(self, event):
+        '''
+        moves gun back
+        event: type list
+        '''
+        self.x -= 1
+        canv.coords(self.id, self.x + 20, 450, self.x + 50, 420)
+        canv.coords(self.id1, self.x + 2, 453)
 
 
 # creating our different targets
@@ -377,6 +409,8 @@ def new_game(event=''):
     canv.bind('<Button-1>', g1.fire2_start)
     canv.bind('<ButtonRelease-1>', g1.fire2_end)
     canv.bind('<Motion>', g1.targetting)
+    canv.bind('<Control-Motion>', g1.move_straight)
+    canv.bind('<Shift-Motion>', g1.move_back)
     z = 0.03
     for tar in t:
         tar.live = 1
@@ -433,6 +467,8 @@ def new_game(event=''):
                 canv.itemconfig(screen1, text='Вы уничтожили цели за ' + str(bullet) + ' выстрелов')
                 canv.bind('<Button-1>', '')
                 canv.bind('<ButtonRelease-1>', '')
+                canv.bind('<Shift-Motion>', '')
+                canv.bind('<Control-Motion>', '')
         # updates screen after every step
         canv.update()
         # time between two updates
