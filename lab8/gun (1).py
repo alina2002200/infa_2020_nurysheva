@@ -21,20 +21,52 @@ image2 = image2.resize((50, 50), Image.ANTIALIAS)
 fiksik_image = ImageTk.PhotoImage(image2)
 
 
-class Picture1():
+class Targets_functions():
     '''
-    class that describes picture1
+    class that describes targets that will be created
     '''
 
     def __init__(self):
         '''
-        sets initial characteristics of picture:
-        number of poins, living limit, radious, image
+        sets initial characteristics of different targets:
+        number of poins, living limit, radious
         '''
         self.points = 0
         self.live = 1
         self.r = 25
+
+    def check_border(self):
+        '''
+        checks if border was hiiten
+        changes sign of velocities
+        '''
+        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
+            self.vx = -self.vx
+        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
+            self.vy = -self.vy
+
+    def hit(self, out, points=1):
+        '''
+        points in type int
+        '''
+        canv.coords(self.id, out)
+        self.points += points
+
+
+class Picture1(Targets_functions):
+    '''
+    class that describes picture1: takes
+    number of poins, living limit, radious
+    from Target_functions
+    '''
+
+    def __init__(self):
+        '''
+        sets initial characteristics of picture: image
+        '''
+        super().__init__()
         self.id = canv.create_image(0, 0, anchor='nw', image=lion_image)
+        self.out = (-100, -100)
 
     def new_target(self):
         ''' 
@@ -44,25 +76,7 @@ class Picture1():
         y = self.y = rnd(300, 550)
         self.vx = rnd(-5, 5)
         self.vy = rnd(-5, 5)
-        color = self.color = 'red'
         canv.coords(self.id, self.x, self.y)
-
-    def hit(self, points=1):
-        '''
-        points in type int
-        '''
-        canv.coords(self.id, -100, -100)
-        self.points += points
-
-    def check_border(self):
-        '''
-        checks if border was hiiten 
-        changes sign of velocities 
-        '''
-        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
-            self.vx = -self.vx
-        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
-            self.vy = -self.vy
 
     def move(self):
         '''
@@ -74,20 +88,19 @@ class Picture1():
         canv.coords(self.id, self.x + self.vx, self.y + self.vy)
 
 
-class Picture2():
+class Picture2(Targets_functions):
     '''
-    class that describes picture2
+    class that describes picture2: takes
+    number of poins, living limit, radious
+    from Target_functions
     '''
-
     def __init__(self):
         '''
-        sets initial characteristics of picture:
-        number of poins, living limit, radious, image
+        sets initial characteristics of picture: image
         '''
-        self.points = 0
-        self.live = 1
-        self.r = 25
+        super().__init__()
         self.id = canv.create_image(0, 0, anchor='nw', image=fiksik_image)
+        self.out = (-100, -100)
 
     def new_target(self):
         '''
@@ -97,25 +110,7 @@ class Picture2():
         y = self.y = rnd(300, 550)
         self.vx = rnd(-5, 5)
         self.vy = rnd(-5, 5)
-        color = self.color = 'red'
         canv.coords(self.id, self.x, self.y)
-
-    def hit(self, points=1):
-        '''
-        points in type int
-        '''
-        canv.coords(self.id, -100, -100)
-        self.points += points
-
-    def check_border(self):
-        '''
-        checks if border was hiiten
-        changes sign of velocities
-        '''
-        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
-            self.vx = -self.vx
-        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
-            self.vy = -self.vy
 
     def move(self):
         '''
@@ -129,6 +124,48 @@ class Picture2():
         self.x += self.vx
         self.y += self.vy
         canv.coords(self.id, self.x + self.vx, self.y + self.vy)
+
+
+class Target(Targets_functions):
+    '''
+    class that describes target: takes
+    number of poins, living limit, radious
+    from Target_functions
+    '''
+
+    def __init__(self):
+        '''
+        sets initial characteristics of target
+        '''
+        super().__init__()
+        if randint(0, 1):
+            self.id = canv.create_oval(0, 0, 0, 0)
+        else:
+            self.id = canv.create_rectangle(0, 0, 0, 0)
+        self.out = (-10, -10, -10, -10)
+
+    def new_target(self):
+        '''
+        Creates new target
+        '''
+        x = self.x = rnd(600, 780)
+        y = self.y = rnd(300, 550)
+        r = self.r = rnd(2, 50)
+        self.vx = rnd(-5, 5)
+        self.vy = rnd(-5, 5)
+        color = self.color = 'red'
+        canv.coords(self.id, x - r, y - r, x + r, y + r)
+        canv.itemconfig(self.id, fill=color)
+
+    def move(self):
+        '''
+        moves target on one step in time
+        '''
+        self.check_border()
+        self.x += self.vx
+        self.y += self.vy
+        canv.coords(self.id, self.x - self.r, self.y - self.r,
+                    self.x + self.r, self.y + self.r)
 
 
 class Ball():
@@ -205,64 +242,6 @@ class Ball():
             return True
         else:
             return False
-
-
-class Target():
-    '''
-    class that describes target
-    '''
-
-    def __init__(self):
-        '''
-        sets initial characteristics of target
-        '''
-        self.points = 0
-        self.live = 1
-        if randint(0, 1):
-            self.id = canv.create_oval(0, 0, 0, 0)
-        else:
-            self.id = canv.create_rectangle(0, 0, 0, 0)
-
-    def new_target(self):
-        ''' 
-        Creates new target 
-        '''
-        x = self.x = rnd(600, 780)
-        y = self.y = rnd(300, 550)
-        r = self.r = rnd(2, 50)
-        self.vx = rnd(-5, 5)
-        self.vy = rnd(-5, 5)
-        color = self.color = 'red'
-        canv.coords(self.id, x - r, y - r, x + r, y + r)
-        canv.itemconfig(self.id, fill=color)
-
-    def hit(self, points=1):
-        '''
-        moves from the screen if hitted
-        points in type int
-        '''
-        canv.coords(self.id, -10, -10, -10, -10)
-        self.points += points
-
-    def check_border(self):
-        '''
-        checks if border was hiiten 
-        changes sign of velocities 
-        '''
-        if self.x + self.vx <= 0 or self.x + self.vx >= 800:
-            self.vx = -self.vx
-        if self.y + self.vy <= 0 or self.y + self.vy >= 600:
-            self.vy = -self.vy
-
-    def move(self):
-        '''
-        moves target on one step in time
-        '''
-        self.check_border()
-        self.x += self.vx
-        self.y += self.vy
-        canv.coords(self.id, self.x - self.r, self.y - self.r,
-                    self.x + self.r, self.y + self.r)
 
 
 class Point():
@@ -429,17 +408,17 @@ def new_game(event=''):
             for tar in t:
                 if b.hittest(tar) and tar.live:
                     tar.live = 0
-                    tar.hit()
+                    tar.hit(tar.out)
                     p.if_hitted(t, im, ima)
             for i in im:
                 if b.hittest(i) and i.live:
                     i.live = 0
-                    i.hit()
+                    i.hit(i.out)
                     p.if_hitted(t, im, ima)
             for j in ima:
                 if b.hittest(j) and j.live:
                     j.live = 0
-                    j.hit()
+                    j.hit(i.out)
                     p.if_hitted(t, im, ima)
             sum_t = 0
             sum_im = 0
