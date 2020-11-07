@@ -387,7 +387,7 @@ t = [Target() for i in range(5)]
 im = [Picture1() for i in range(5)]
 ima = [Picture2() for i in range(5)]
 p = Point(t, im, ima)
-screen1 = canv.create_text(400, 300, text='', font='28')
+screen1 = canv.create_text(400, 90, text='', font='28')
 g1 = Gun()
 bullet = 0
 balls = []
